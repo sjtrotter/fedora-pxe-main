@@ -27,7 +27,7 @@ firstboot --enable --reconfig
 # Generated using Blivet version 3.4.3
 #ignoredisk --only-use=nvme0n1
 #autopart --encrypted
-autopart --encrypted --passphrase "{{ encryption_password }}""
+autopart --encrypted --passphrase "{{ encryption_password }}"
 # Partition clearing information
 #clearpart --none --initlabel
 clearpart --initlabel --all
