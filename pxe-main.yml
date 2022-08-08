@@ -4,6 +4,7 @@
   vars:
     version: 36
     pxe_main_IP: 192.168.1.250
+    encryption_password: "workstation"
   tasks:
 
     - name: Install HTTP
@@ -28,6 +29,9 @@
       with_items:
         - { src: ./plays, dest: "/var/www/html/f{{ version }}-inst.local/" }
         - { src: ./other, dest: "/var/www/html/f{{ version }}-inst.local/" }
+        - { src: ./templates/kickstarts/basic-workstation.ks.j2, dest: "/var/www/html/f{{ version }}-inst.local/ks/fedora-{{ version }}-basic-workstation.ks.j2" }
+        - { src: ./templates/kickstarts/manual-install.ks.j2, dest: "/var/www/html/f{{ version }}-inst.local/ks/fedora-{{ version }}-manual-install.ks.j2" }
+        - { src: ./templates/kickstarts/virtual-workstation.ks.j2, dest: "/var/www/html/f{{ version }}-inst.local/ks/fedora-{{ version }}-virtual-workstation.ks.j2" }
       
     - name: Download Required Install Files
       ansible.builtin.get_url:
@@ -40,14 +44,14 @@
         - { src: "https://download.fedoraproject.org/pub/fedora/linux/releases/{{ version }}/Everything/x86_64/os/.treeinfo", dest: "/var/www/html/f{{ version }}-inst.local/.treeinfo" }
         - { src: "https://download.fedoraproject.org/pub/fedora/linux/releases/{{ version }}/Everything/x86_64/os/.discinfo", dest: "/var/www/html/f{{ version }}-inst.local/.discinfo" }
 
-    - name: Copy Template Files
-      ansible.builtin.template:
-        src: "{{ item.src }}"
-        dest: "{{ item.dest }}"
-      with_items:
-        - { src: ./templates/kickstarts/basic-workstation.ks.j2, dest: "/var/www/html/f{{ version }}-inst.local/ks/fedora-{{ version }}-basic-workstation.ks" }
-        - { src: ./templates/kickstarts/manual-install.ks.j2, dest: "/var/www/html/f{{ version }}-inst.local/ks/fedora-{{ version }}-manual-install.ks" }
-        - { src: ./templates/kickstarts/virtual-workstation.ks.j2, dest: "/var/www/html/f{{ version }}-inst.local/ks/fedora-{{ version }}-virtual-workstation.ks" }
+    # - name: Copy Template Files
+    #   ansible.builtin.template:
+    #     src: "{{ item.src }}"
+    #     dest: "{{ item.dest }}"
+    #   with_items:
+    #     - { src: ./templates/kickstarts/basic-workstation.ks.j2, dest: "/var/www/html/f{{ version }}-inst.local/ks/fedora-{{ version }}-basic-workstation.ks" }
+    #     - { src: ./templates/kickstarts/manual-install.ks.j2, dest: "/var/www/html/f{{ version }}-inst.local/ks/fedora-{{ version }}-manual-install.ks" }
+    #     - { src: ./templates/kickstarts/virtual-workstation.ks.j2, dest: "/var/www/html/f{{ version }}-inst.local/ks/fedora-{{ version }}-virtual-workstation.ks" }
 
     - name: Remove Earlier Versions Repo
       ansible.builtin.file:
