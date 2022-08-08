@@ -37,7 +37,7 @@ timezone Etc/UTC --utc
 
 #Root password
 rootpw --lock
-#user --groups=wheel --name=user --password=workstation --gecos="user"
+{{ user_string }}
 %post
 
 CR=$(printf '\r')
