@@ -14,7 +14,7 @@ network  --bootproto=dhcp --device=eno1 --ipv6=auto --activate
 network  --hostname=workstation
 
 # Use network installation
-url --url="http://{{ ansible_default_ipv4.address }}/f{{ version }}-inst.local/"
+url --url="http://{{ pxe_main_IP }}/f{{ version }}-inst.local/"
 
 %packages
 @^workstation-product-environment
@@ -52,10 +52,10 @@ dnf install ansible wget -y
 
 echo ""
 echo "getting playbook, networkminer icon, wallpapers, and settings..."
-wget http://{{ ansible_default_ipv4.address }}/f{{ version }}-inst.local/plays/workstation-post.yml
-wget http://{{ ansible_default_ipv4.address }}/f{{ version }}-inst.local/other/networkminer.png
-wget -r -np -nH --cut-dirs=2 -R "index.html*" http://{{ ansible_default_ipv4.address }}/f{{ version }}-inst.local/other/wallpapers/ -P /usr/share/backgrounds
-wget http://{{ ansible_default_ipv4.address }}/f{{ version }}-inst.local/other/settings.tar.gz
+wget http://{{ pxe_main_IP }}/f{{ version }}-inst.local/plays/workstation-post.yml
+wget http://{{ pxe_main_IP }}/f{{ version }}-inst.local/other/networkminer.png
+wget -r -np -nH --cut-dirs=2 -R "index.html*" http://{{ pxe_main_IP }}/f{{ version }}-inst.local/other/wallpapers/ -P /usr/share/backgrounds
+wget http://{{ pxe_main_IP }}/f{{ version }}-inst.local/other/settings.tar.gz
 
 echo ""
 echo "running ansible playbook..."
