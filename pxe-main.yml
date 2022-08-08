@@ -43,13 +43,7 @@
         - { src: /opt/syslinux/usr/share/syslinux/lpxelinux.0, dest: /var/lib/tftpboot/bios/lpxelinux.0 }
         - { src: /opt/syslinux/boot/efi/EFI/fedora/shimx64.efi, dest: /var/lib/tftpboot/uefi/shimx64.efi }
         - { src: /opt/syslinux/boot/efi/EFI/fedora/grubx64.efi, dest: /var/lib/tftpboot/uefi/grubx64.efi }
-        # - { src: ./plays/workstation-post.yml, dest: "/var/www/html/f{{ version }}-inst.local/plays/workstation-post.yml" }
-        # - { src: ./plays/virtual-post.yml, dest: "/var/www/html/f{{ version }}-inst.local/plays/virtual-post.yml" }
         - { src: ./plays, dest: "/var/www/html/f{{ version }}-inst.local/" }
-        # - { src: ./other/networkminer.png, dest: "/var/www/html/f{{ version }}-inst.local/other/networkminer.png" }
-        # - { src: ./other/settings.tar.gz, dest: "/var/www/html/f{{ version }}-inst.local/other/settings.tar.gz" }
-        # - { src: ./other/wallpapers, dest: "/var/www/html/f{{ version }}-inst.local/" }
-        # - { src: ./other/vncuseradd/vncuseradd, dest: "/var/www/html/f{{ version }}-inst.local/other/" }
         - { src: ./other, dest: "/var/www/html/f{{ version }}-inst.local/" }
       
     - name: Download Required Install Files
