@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+if [[ "${SUBJECT}" == "" ]]; then exit; fi
+{
+    POST_USERADD_USER=${SUBJECT}
+    POST_USERADD_UID=$(id -u ${POST_USERADD_USER})
+
+    POST_USERADD_DISPLAY_NUM="${POST_USERADD_UID:2:2}"
+    if [[ ${POST_USERADD_DISPLAY_NUM:0:1} -eq 0 ]]; then
+        POST_USERADD_DISPLAY_NUM="${POST_USERADD_DISPLAY_NUM:1:1}"
+    fi
+    POST_USERADD_DISPLAY_NUM="$((${POST_USERADD_DISPLAY_NUM}+10))"
+    POST_USERADD_DISPLAY=":${POST_USERADD_DISPLAY_NUM}"
+    printf "${POST_USERADD_DISPLAY}=${POST_USERADD_USER}\n" >> /etc/tigervnc/vncserver.users
+    su $POST_USERADD_USER -c 'printf "password\npassword\n" | vncpasswd 2>&1>/dev/null'
+    systemctl enable "vncserver@${POST_USERADD_DISPLAY}.service"
+} 2>&1 >> /tmp/useradd-vnc-log.txt

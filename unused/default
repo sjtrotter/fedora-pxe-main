@@ -1,0 +1,18 @@
+default vesamenu.c32
+prompt 1
+timeout 600
+
+label local
+menu label Boot from ^local drive
+menu default
+localboot 0xffff
+
+label manual
+menu label ^Manual Install - Fedora {{ version }} 64-bit
+kernel http://{{ ansible_default_ipv4.address }}/f{{ version }}-inst.local/images/pxeboot/vmlinuz
+append initrd=http://{{ ansible_default_ipv4.address }}/f{{ version }}-inst.local/images/pxeboot/initrd.img inst.repo=http://{{ ansible_default_ipv4.address }}/f{{ version }}-inst.local/ ip=dhcp
+
+label auto
+menu label ^Auto Install - Fedora {{ version }} Basic Workstation
+kernel http://{{ ansible_default_ipv4.address }}/f{{ version }}-inst.local/images/pxeboot/vmlinuz
+append initrd=http://{{ ansible_default_ipv4.address }}/f{{ version }}-inst.local/images/pxeboot/initrd.img inst.repo=http://{{ ansible_default_ipv4.address }}/f{{ version }}-inst.local/ ip=dhcp inst.ks=http://{{ ansible_default_ipv4.address }}/f{{ version }}-inst.local/ks/basic-workstation.ks
