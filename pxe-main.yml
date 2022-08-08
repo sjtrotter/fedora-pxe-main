@@ -3,6 +3,7 @@
   become: true
   vars:
     version: 36
+    pxe_main_IP: 192.168.1.250
   tasks:
 
     - name: Install TFTP, HTTP and DHCP
