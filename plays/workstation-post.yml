@@ -20,7 +20,14 @@
       with_items:
         - { src: /tmp/nm.zip, dest: /opt }
         - { src: unclass-certificates_pkcs7_v5-6_dod.zip, dest: '.' }
+
+    - name: Extract Settings (if there)
+      ansible.builtin.unarchive:
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+      with_items:
         - { src: settings.tar.gz, dest: '/' }
+      ignore_errors: true
 
     - name: Get NM and Wallpaper Paths
       ansible.builtin.find:
