@@ -1,4 +1,4 @@
-# fedora-pxe-setup
+# fedora-pxe-main
 Setup repository for a Fedora PXE server.
 
 Loosely based on [Fedora PXE Setup](https://docs.fedoraproject.org/en-US/fedora/latest/install-guide/advanced/Network_based_Installations/#pxe-overview).
@@ -15,17 +15,17 @@ Files:
 - pxe-main.yml - ansible playbook that sets up a main PXE server using the files in this directory. See pxe-main flow for more info.
 - README.md - this file.
 - settings.tar.gz - contains local settings for firefox, chrome, vscode, local password policy, and .bashrc's for root and all users. this file will likely be removed from this repository and distributed ad-hoc due to the potentially sensitive nature of files in here. *This file has been removed; see section below on how to build it.* (you must build one to successfully execute this playbook, and place it in the `other` folder)
-- virtual-post.yml - ansible playbook that sets up a base Virtual Machine fedora workstation. be default some things are omitted from here, like vmware horizon; our use case requires smart cards, and we can't broker smartcard over VNC so it is not needed; also removed virtualization capability i.e. gnome-boxes and also added a VNC server (see adduser.local above). **this can probably still be improved**.
+- virtual-post.yml - ansible playbook that sets up a base Virtual Machine fedora workstation. by default some things are omitted from here, like vmware horizon; our use case requires smart cards, and we can't broker smartcard over VNC so it is not needed; also removed virtualization capability i.e. gnome-boxes and also added a VNC server (see adduser.local above). **this can probably still be improved**.
 - virtual-workstation.ks - the accompanying kickstart file to automatically install with the virtual-post.yml configuration.
 - vncuseradd - bash script placed in /usr/loca/bin on virtual workstations. Can be used to create new users with VNC capabilities.
 - vncuseradd.8.gz - the man page for the vncuseradd script.
 - workstation-post.yml - the basic workstation ansible playbook that installs a standard loadout of software.
 
-# flow of pxe-setup.yml
+# flow of pxe-main.yml
 
 **this is a high-level overview and is not an exhaustive list of what happens; see the yml for more info**. the ansible script will download needed components for the server (httpd for this one). it then downloads the kernel and initrd. afterward it writes a new repo file for the Everything branch of the fedora mirror. it writes the template config files to the relevant locations and then opens the firewall to allow the services to be accessible, and starts/restarts and enables the services. at the end it then syncs the repo. **this takes a long time, it is about 85 GB**.
 
-IF any files are changed on the pxe server, i.e. pxe-main.yml file to change the publicly accessible IP, the pxe-setup.yml should be run again with `sudo ansible-playbook pxe-setup.yml` within this directory. **the local repo sync will take much less time, as it will only verify vice re-download**.
+IF any files are changed on the pxe server, i.e. pxe-main.yml file to change the publicly accessible IP, the pxe-main.yml should be run again with `sudo ansible-playbook pxe-main.yml` within this directory. **the local repo sync will take much less time, as it will only verify vice re-download**.
 
 # HOWTO: Documentation
 the following items need to be within the documentation:
@@ -71,7 +71,7 @@ the following items need to be within the documentation:
     - `sudo dnf install ansible git NetworkManager-tui python3-netaddr`
     - `git clone https://github.com/sjtrotter/fedora-pxe-main.git`
     - Use nmtui to set network information manually. Make sure you set the IP with a /XX for the CIDR, and make sure you set the DNS and Gateway appropriately. ( run `nmtui` )
-    - If using an ad-hoc version of settings.tar.gz, place it in the fedora-pxe-setup directory.
+    - If using an ad-hoc version of settings.tar.gz, place it in the fedora-pxe-main/other directory.
     - `sudo ansible-playbook fedora-pxe-main/pxe-main.yml` (make sure you use the path into the git clone, if you have cd'd elsewhere)
 6. Done.
     Once the ansible playbook completes successfully, the server is ready to serve files for PXE stub servers.
@@ -82,13 +82,13 @@ This assumes you have previously set up a PXE server as a VM according to above 
 2. Boot from console:
     - Login, then use nmtui ( run `nmtui` ) to set network information manually.
     - `cd fedora-pxe-main` and then `git pull` to update files
-    - if using an ad-hoc version of settings.tar.gz, place it in the fedora-pxe-setup directory.
+    - if using an ad-hoc version of settings.tar.gz, place it in the fedora-pxe-main/other directory.
     - `sudo ansible-playbook pxe-main.yml` to update and place all files.
 3. Done.
     Once the ansible playbook completes successfully, the server is ready to serve files for PXE stub servers.
 
 ## howto: Upgrade Fedora version
-Fedora upgrades about every 6 months, in April-ish and October-ish. When ready to test the next version, change the `version: ##` line at the top of pxe-setup.yml (line 5) to the appropriate number. *Make sure stub pxe servers also update their version.*
+Fedora upgrades about every 6 months, in April-ish and October-ish. When ready to test the next version, change the `version: ##` line at the top of pxe-main.yml (line 5) to the appropriate number. *Make sure stub pxe servers also update their version.*
 
 One potential breakage this may cause is the CERT Forensic Tools packages. The administrator of the PXE server should ensure that the repository at https://forensics.cert.org/fedora/cert/ is available for the new Fedora version before attempting upgrade (make sure there is a folder for the new version). They should also check to ensure a new key is not needed, by reviewing documentation at https://forensics.cert.org/#fedorasupport
 
@@ -104,7 +104,7 @@ Setting this number 2 versions higher than the original installation of the PXE 
 
 Once you change any files, **DO NOT** git push back into the repository, if you have set up to push.
 
-If you change any files, you need to run/re-run `sudo ansible-playbook pxe-setup.yml` to apply the changes.
+If you change any files, you need to run/re-run `sudo ansible-playbook pxe-main.yml` to apply the changes.
 
 ## howto: Customize settings.tar.gz
 The default settings.tar.gz contains files that are meant to be uncompressed in the root (/) directory. It contains default settings for Firefox, Chrome, and .bashrc and /root/.bashrc, and also contains a more robust password policy. You may want to include things like default settings for Horizon or for Autopsy to connect to a multi-user database. If so, you will need to add it to the settings tarball to have it take effect.
@@ -124,9 +124,11 @@ When done adding the settings you want, re-zip the files:
 - `sudo gzip settings.tar`
 
 And then, scp the files to the PXE server. (make sure SSH is on, on the pxe server and the laptop, with `sudo systemctl start sshd`)
-- `scp settings.tar.gz [pxe user]@[pxe ip]:/path/to/fedora-pxe-setup/settings.tar.gz`
+- `scp settings.tar.gz [pxe user]@[pxe ip]:/path/to/fedora-pxe-main/other/settings.tar.gz`
 
 In general, I have edited settings for google-chrome, firefox, autopsy, remmina, and .bashrc's. I moved all these files to /etc/skel after finding them and then added /etc/skel to the tarball. Same for the password policy.
+
+Make sure you re-run pxe-main.yml after updating the tarball.
 
 ## howto: adding new software to the base image
 At times new software may be requested to be added to the base image. in order to do this, testing must be done:
